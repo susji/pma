@@ -1,6 +1,3 @@
-#![feature(exclusive_range_pattern)]
-#![feature(nll)]
-
 #[derive(Debug, Eq, PartialEq, PartialOrd, Copy, Clone)]
 pub enum Verbosity {
     Minimal,
