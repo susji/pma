@@ -1,0 +1,9 @@
+[package]
+name = "pma"
+version = "0.1.0"
+authors = ["susji <susji@protonmail.com>"]
+edition = "2018"
+
+[dependencies]
+regex = "1"
+lazy_static = "1"

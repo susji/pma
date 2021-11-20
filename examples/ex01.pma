@@ -1,0 +1,27 @@
+# This is an example. The default target will be "all".
+
+(set "CC" "cc")
+(set "BUILD" "echo [$CC] \\t$$TARGET; $CC -o $$TARGET $$DEPS")
+
+(target all ("foo" sentinel) ("echo [all] Evaluated everything."))
+
+(target
+	"foo"
+	("foo_main.o" "foo_util.o")
+	("$BUILD"
+	 "ls -l foo"))
+
+(target
+	"foo_main.o"
+	("foo_main.c")
+	("$BUILD -c"))
+
+(target
+	"foo_util.o"
+	("foo_util.c")
+	("$BUILD -c"))
+
+(target clean () ("rm -f foo foo_main.o foo_util.o .sentinel"))
+
+(target ".sentinel" (".sentinel") ("touch .sentinel" "ls -l $DEPS"))
+(target sentinel (".sentinel") ("echo Checking $TARGET..."))

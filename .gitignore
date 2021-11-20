@@ -1,0 +1,3 @@
+/target
+examples/foo*.o
+examples/foo
