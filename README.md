@@ -2,16 +2,27 @@
 
 `pma` is a minimalistic builder based on s-expressions.
 
+## Example use
+
+`cargo` and a recent `rust` development environment are assumed. The
+`pma` program expects build targets as command-line parameters. It
+expects build rules from `stdin`.
+
+	$ cd examples
+	$ cat ex01.pma | cargo run clean all
+
+If no targets are specified, the first encountered rule is evaluated.
+
 ## Grammar
 
 `pma` files are always UTF-8-encoded.
 
-    comment     = "#", no-lf, "\n" ;
-    list        = "(", [ list-member ] , ")" ;
-    list-member = list | atom ;
-    atom        = identifier | string ;
-    identifier  = { ( ascii-letter | "-" ) } ;
-    string      = '"', { any-utf8-no-quote }, '"'
+	comment     = "#", no-lf, "\n" ;
+	list        = "(", [ list-member ] , ")" ;
+	list-member = list | atom ;
+	atom        = identifier | string ;
+	identifier  = { ( ascii-letter | "-" ) } ;
+	string      = '"', { any-utf8-no-quote }, '"'
 
 The above grammar defines the overall syntax. Exact semantics are specified
 below.
@@ -26,7 +37,7 @@ commands undergo parameter expansion similarly to traditional `Makefile`s.
 
 The following target-specific parameter expansions are supported:
 
-  $TARGET $DEPS
+	$TARGET $DEPS
 
 where `$TARGET` expands to the current target's filename and `$DEPS` expands to
 a whitespace-delimited list of all dependencies.
@@ -35,11 +46,11 @@ a whitespace-delimited list of all dependencies.
 
 A valid parameter name is defined as follows:
 
-    parameter  = "$", pchar,  { ( pchar | digit ) } ;
-    pchar      = puppercase | plowercase | "_" ;
-    puppercase = "A" | ... | "Z" ;
-    plowercase = "a" | ... | "z" ;
-    digit      = "0" | ... | "9" ;
+	parameter  = "$", pchar,  { ( pchar | digit ) } ;
+	pchar      = puppercase | plowercase | "_" ;
+	puppercase = "A" | ... | "Z" ;
+	plowercase = "a" | ... | "z" ;
+	digit      = "0" | ... | "9" ;
 
 To insert a plain `$` into a string, it must be escaped as `$$`.
 
@@ -47,14 +58,14 @@ To insert a plain `$` into a string, it must be escaped as `$$`.
 
 Global parameters are defined like this:
 
-   (set "<name>" "<value>")
+	(set "<name>" "<value>")
 
 The `<value>` expansion undergoes parameter expansion. As an example, consider
 the following:
 
-    (set "ARCH" "imaginary-arch")
-    (set "CC" "$ARCH-cc")           # $CC => "imaginary-arch-cc"
-    (set "LD" "$ARCH-ld")           # $LD => "imaginary-arch-ld"
+	(set "ARCH" "imaginary-arch")
+	(set "CC" "$ARCH-cc")           # $CC => "imaginary-arch-cc"
+	(set "LD" "$ARCH-ld")           # $LD => "imaginary-arch-ld"
 
 ### Dependency
 
@@ -72,27 +83,27 @@ the build process.
 
 A target declaration is defined like this:
 
-    (target
-        "<target-filename>"
-        (<str-or-id-1> ... <str-or-id-N)
-        ("<command-1>" ... "<command-N>"))
+	(target
+		"<target-filename>"
+		(<str-or-id-1> ... <str-or-id-N)
+		("<command-1>" ... "<command-N>"))
 
 
 Target declarations to build a C program could look like this:
 
-    (target "foo_util.o" ("foo_util.c") ("$CC -c -o $TARGET $DEPS"))
-    (target "foo_main.o" ("foo_main.c" ("$CC -c -o $TARGET $DEPS"))
-    (target "foo" ("foo_util.o" "foo_main.o") ("$LD -o $TARGET $DEPS"))
+	(target "foo_util.o" ("foo_util.c") ("$CC -c -o $TARGET $DEPS"))
+	(target "foo_main.o" ("foo_main.c" ("$CC -c -o $TARGET $DEPS"))
+	(target "foo" ("foo_util.o" "foo_main.o") ("$LD -o $TARGET $DEPS"))
 
 ### Declaring a pseudo-target rule
 
 Pseudo-targets are rules without any link to an actual file. They are always
 considered out-of-date. A pseudo-target declaration is defined like this:
 
-    (target
-        <pseudo-target-id>
-        (<str-or-id-1> ... <str-or-id-N)
-        ("<command-1>" ... "<command-N>"))
+	(target
+		<pseudo-target-id>
+		(<str-or-id-1> ... <str-or-id-N)
+		("<command-1>" ... "<command-N>"))
 
 ### Resolving dependencies
 
